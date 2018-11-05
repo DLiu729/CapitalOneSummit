@@ -18,6 +18,7 @@ library(gmapsdistance)
 library(geosphere)
 library(ggplot2)
 library(reshape2)
+
 tripData <- read.csv(file = "los-angeles-metro-bike-share-trip-data/metro-bike-share-trip-data.csv", header = TRUE)
 ## Start/stop stations are most popular
 startingStation <- tripData[, c('Starting.Station.ID'), drop=FALSE]
@@ -38,6 +39,7 @@ names(startingStationpop10) <- c("Starting Station ID", "Frequency")
 names(endingStationpop10) <- c("Ending Station ID", "Frequency")
 # Top 3 Start Stations: 3069, 3030, 3005
 # Top 3 Stop Stations: 3005, 3031, 3014
+
 ## Average distance traveled (12.5 kmph is the average casual biker speed)
 oneWayTrip <- tripData[tripData$Trip.Route.Category == "One Way",]
 roundTrip <- tripData[tripData$Trip.Route.Category == "Round Trip",]
@@ -70,6 +72,7 @@ colnames(distanceAdjusted)[1] = "Duration"
 distanceAll <- rbind(distanceAdjusted, roundTripDistance)
 avgdistance <- mean(distanceAll$Duration, na.rm = TRUE)
 # Avg Distance = 7814.64 m
+
 ## Riders regular part of commute
 RegularTrip <- tripData[tripData$Passholder.Type == "Monthly Pass" | tripData$Passholder.Type == "Flex Pass" | tripData$Passholder.Type == "Staff Annual",]
 PassholderTypeDistribution = count(tripData, Passholder.Type)
@@ -77,6 +80,7 @@ ggplot(data = PassholderTypeDistribution, aes(x = Passholder.Type, y = n)) + geo
 PassholderTypeDistributionNew <- PassholderTypeDistribution
 names(PassholderTypeDistributionNew) = c("Passholder Type", "Frequency")
 # 91203 out of 132427 used a monthly or flex pass --> 68.9%
+
 ## Data Visuals or Trends possibilities
 # Average Duration vs. Hour of Day
 TimeVsStart <- tripData[, c('Duration', 'Start.Time', 'Passholder.Type', 'Trip.Route.Category', 'Starting.Station.ID', 'Ending.Station.ID')]
@@ -89,10 +93,12 @@ colnames(timeHourMinSecSplit)[3] = "Second"
 TimeVsStart <- cbind(TimeVsStart, timeHourMinSecSplit)
 durationMeanHour <- aggregate(Duration~Hour, data = TimeVsStart, mean)
 plot(durationMeanHour$Hour, durationMeanHour$Duration, main = "Average Duration vs. Hour of Day", xlab = "Hour of Day", ylab = "Average Duration (sec)")
+
 # Average Duration vs. Passholder Type
 TypeVsDuration <- tripData[, c('Passholder.Type', 'Duration')]
 durationMeanType <- aggregate(Duration~Passholder.Type, data = TypeVsDuration, mean)
 plot(durationMeanType$Passholder.Type, durationMeanType$Duration, main = "Average Duration vs. Passholder Type", xlab = "Passholder Type", ylab = "Average Duration (sec)")
+
 # Average Duration vs. Month 
 timeYearMonthDaySplit <- data.frame(str_split_fixed(as.character(TimeVsStart$X1), '-', 3))
 colnames(timeYearMonthDaySplit)[1] = "Year"
@@ -101,6 +107,7 @@ colnames(timeYearMonthDaySplit)[3] = "Day"
 TimeVsStart <- cbind(TimeVsStart, timeYearMonthDaySplit)
 durationMeanMonth <- aggregate(Duration~Month, data = TimeVsStart, mean)
 plot(durationMeanMonth$Month, durationMeanMonth$Duration, main = "Average Duration vs. Month", xlab = "Month", ylab = "Average Duration (sec)")
+
 # Passholder Type vs. Month
 TypeVsMonth <- TimeVsStart[, c('Passholder.Type', 'Month')]
 TypeVsMonthCounts <- ddply(TypeVsMonth, .(TypeVsMonth$Passholder.Type, TypeVsMonth$Month), nrow)
@@ -114,9 +121,13 @@ plot(MonthlyTypeVsMonths$Month, MonthlyTypeVsMonths$Freq, main = "Monthly Pass U
 plot(StaffTypeVsMonths$Month, StaffTypeVsMonths$Freq, main = "Staff Pass Usage By Month", xlab = "Month", ylab = "Frequency")
 plot(WalkTypeVsMonths$Month, WalkTypeVsMonths$Freq, main = "Walk-Up By Month", xlab = "Month", ylab = "Frequency")
 ggplot(data = TypeVsMonthCounts, aes(x = Month, y = Freq, fill = Passholder.Type)) + geom_bar(stat="identity", position = "dodge") + xlab("Month") + ylab("Frequency") + ggtitle("Frequency based on Month and Passholder Type") + labs(fill = "Passholder Type")
+TypeVsMonthTable <- TypeVsMonthCounts
+names(TypeVsMonthTable) <- c("Passholder Type", "Month", "Frequency")
+
 # Number of Riders by Month
 RidersByMonth = count(TimeVsStart, Month)
 plot(RidersByMonth$Month, RidersByMonth$n, main = "Riders By Month", xlab = "Month", ylab = "Frequency")
+
 # Trip Route Category by Month
 RoutecatVsMonth <- TimeVsStart[, c('Trip.Route.Category', 'Month')]
 RoutecatVsMonthCounts <- ddply(RoutecatVsMonth, .(RoutecatVsMonth$Trip.Route.Category, RoutecatVsMonth$Month), nrow)
@@ -126,6 +137,9 @@ RoundTripVsMonthCounts <- RoutecatVsMonthCounts[RoutecatVsMonthCounts$Trip.Route
 plot(OneWayVsMonthCounts$Month, OneWayVsMonthCounts$Freq, main = "One Way Trips By Month", xlab = "Month", ylab = "Frequency")
 plot(RoundTripVsMonthCounts$Month, RoundTripVsMonthCounts$Freq, main = "Round Trips By Month", xlab = "Month", ylab = "Frequency")
 ggplot(data = RoutecatVsMonthCounts, aes(x = Month, y = Freq, fill = Trip.Route.Category)) + geom_bar(stat="identity", position = "dodge") + xlab("Month") + ylab("Frequency") + ggtitle("Frequency based on Month and Trip Route Category") + labs(fill = "Trip Route Category")
+RoutecatVsMonthTable <- RoutecatVsMonthCounts
+names(RoutecatVsMonthTable) <- c("Trip Route Category", "Month", "Frequency")
+
 # Trip Route Category-Passholder type combinations
 CategoryVsType <- tripData[, c('Passholder.Type', 'Trip.Route.Category')]
 CategoryVsTypeCounts <- ddply(CategoryVsType, .(CategoryVsType$Passholder.Type, CategoryVsType$Trip.Route.Category), nrow)
@@ -133,6 +147,7 @@ names(CategoryVsTypeCounts) <- c("Passholder.Type", "Trip.Route.Category", "Freq
 ggplot(data = CategoryVsTypeCounts, aes(x = Passholder.Type, y = Freq, fill = Trip.Route.Category)) + geom_bar(stat="identity", position = "dodge") + xlab("Passholder Type") + ylab("Frequency") + ggtitle("Frequency based on Passholder Type and Trip Route Category") + labs(fill = "Trip Route Category")
 CategoryVsTypeTable <- CategoryVsTypeCounts
 names(CategoryVsTypeTable) <- c('Passholder Type', 'Trip Route Category', 'Frequency')
+
 # Net Change of Bikes in a Day
 OneWayByDay <- TimeVsStart[TimeVsStart$Trip.Route.Category == 'One Way',]
 StartingByDay <- OneWayByDay[, c('X1', 'Starting.Station.ID')]
@@ -153,6 +168,7 @@ NetChangeDayTable <- NetChangeDayTable[order(-abs(NetChangeDayTable$NetChangePer
 NetChangeDayTable <- NetChangeDayTable[c(1:20),]
 names(NetChangeDayTable) <- c('Station ID', 'Net Change per day')
 ggplot(data = NetChangeDayCounts, aes(x = Station_ID, y = NetChangePerDay)) + geom_bar(stat="identity", position = "dodge") + xlab("Station ID") + ylab("Average Net Change of Bikes Per Day") + ggtitle("Average Net Change of Bikes Per Day Vs. Station ID") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
 ui <- fluidPage(
   navbarPage("Los Angeles Bike Sharing Data Analysis",
              tabPanel("Summary",
@@ -418,22 +434,31 @@ server <- function(input, output) {
       if(input$AnswersInput == "Ridership changing with the seasons")
       {
         output$AnswersOutput <- renderText({
-          ""
+          paste("Ridership changed with seasons dramatically based on the number of trips. There were thousands more trips in the months of August and September compared to 
+                several other months. This makes sense as the temperature is hot enough for biking weather compared to the winter months.
+                There was a significant difference nominally for both monthly pass and walk-up users during the aforementioned months, with small gains for
+                in flex pass trips. However, the proportion of monthly pass users and walk-up users roughly remained the same relative to each other. Given a higher number of total rides
+                during August and September, it was expected that one way trips increased dramatically during the summer/fall months as well. 
+                What was surprising was that average trip duration by month was opposite of what I expected, as it was greater during the winter months than summer/fall months. 
+                There could be a couple of explanations. As mentioned before about the monthly pass, one way theory, people could be going to work
+                more often using the bike share system, which would take less time than a free roam. There's also an argument that because less people would
+                bike share during winter months, those that do are the ones like to do it longer due to a myriad of reasons.
+                This could be anything from cardio exercise to practicing for a cycling competition. Below are the graphs of Trip Route Category and Passholder type by month")
         })
-        output$AnswersTableOutput <- renderTable({})
-        output$AnswersTable2Output <- renderTable({})
+        output$AnswersTableOutput <- renderTable({TypeVsMonthTable})
+        output$AnswersTable2Output <- renderTable({RoutecatVsMonthTable})
       }
       if(input$AnswersInput == "Net Change of bikes over the day")
       {
         output$AnswersOutput <- renderText({
-          "Below is the top 20 net changes of bikes over the day by station ID. This was done by counting the number of
+          paste("Below is the top 20 net changes of bikes over the day by station ID. This was done by counting the number of
           times a bike started subtracting the number of times a bike started at a station ID during the day by the number of times
           a bike ended at the station ID (ending - starting). Only one-way trips were considered since round-trips obviously start and end at the same place.
           The final net change was measured for each day. The net changes were summed up for each station ID and divided by the total number of days
           a bike had either started or ended at the station ID. The top value of 12 from station 3009 should be 
           analyzed with caution, as that station only had one day of activity, so that could be due to variance. All the other
           values in the top 20 have dozens of days of changes. Even so, there were some large values, as the second largest net charge had a deficit 
-          of over 8 bikes. That means significant movement of bikes is necessary to balance out the bikes for the next day."
+          of over 8 bikes. That means significant movement of bikes is necessary to balance out the bikes for the next day.")
         })
         output$AnswersTableOutput <- renderTable({NetChangeDayTable})
         output$AnswersTable2Output <- renderTable({})
@@ -441,7 +466,7 @@ server <- function(input, output) {
       if(input$AnswersInput == "Trip Route Category-Passholder type combinations")
       {
         output$AnswersOutput <- renderText({
-          "Monthly Pass, One Way was the most popular Trip Route Category-Passholder combination with Walk-Up, One Way coming in second. 
+          paste("Monthly Pass, One Way was the most popular Trip Route Category-Passholder combination with Walk-Up, One Way coming in second. 
           The least popular were the combinations involving the staff annual pass and the Flex Pass, Round Trip combination. I believe there are
           multiple explanations for the popularity of Monthly Pass, One Way. I believe most of the people that use Monthly Pass are those that need
           the bikes for work, school, or other important matters. It's worth it to purchase monthly passes as it allows for consistent use. 
@@ -451,7 +476,7 @@ server <- function(input, output) {
           sense for the second most common combination as there's plenty of times when a bike ride could be the most convenient mode of transportation
           at the moment for a quicker commute. Due to the probably limited amount of staff, the low amount of uses for the staff annual pass
           makes complete sense. The Flex pass potentially yields less results due to its inflexibility. As a result, the market should be focused
-          on monthly passes."
+          on monthly passes.")
         })
         output$AnswersTableOutput <- renderTable({CategoryVsTypeTable})
         output$AnswersTable2Output <- renderTable({})
