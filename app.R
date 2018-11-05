@@ -60,8 +60,8 @@ startingStationSampleLatLong <- oneWayTripSample[, c('Starting.Station.Longitude
 endingStationSampleLatLong <- oneWayTripSample[, c('Ending.Station.Longitude', 'Ending.Station.Latitude')]
 #distanceHaversine <- data.frame(matrix(ncol = 1, nrow = nrow(oneWayTripSample)))
 distanceSampleHaversine <- data.frame(distHaversine(startingStationSampleLatLong, endingStationSampleLatLong))
-distancePercentDiff <- (distance - distanceSampleHaversine)/distanceSampleHaversine * 100
-meandistancePercentDiff <- mean(distancePercentDiff$matrix.ncol...1..nrow...nrow.oneWayTripSample..)
+#distancePercentDiff <- (distance - distanceSampleHaversine)/distanceSampleHaversine * 100
+#meandistancePercentDiff <- mean(distancePercentDiff$matrix.ncol...1..nrow...nrow.oneWayTripSample..)
 # From sample comparing Google Maps bicycling distance vs. haversine distance, on average haversine underestimates by 36.9%
 startingStationLatLong <- oneWayTrip[, c('Starting.Station.Longitude', 'Starting.Station.Latitude')]
 endingStationLatLong <- oneWayTrip[, c('Ending.Station.Longitude', 'Ending.Station.Latitude')]
