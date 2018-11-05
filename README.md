@@ -15,3 +15,5 @@ Is there a net change of bikes over the course of a day? If so, when and
 where should bikes be transported in order to make sure bikes match travel patterns?
 
 What is the breakdown of Trip Route Category-Passholder type combinations? What might make a particular combination more popular?
+
+This was completed using R and the website was made through R Shiny and shinyapps.io
