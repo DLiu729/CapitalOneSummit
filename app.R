@@ -18,6 +18,7 @@ library(gmapsdistance)
 library(geosphere)
 library(ggplot2)
 library(reshape2)
+library(shinythemes)
 
 tripData <- read.csv(file = "los-angeles-metro-bike-share-trip-data/metro-bike-share-trip-data.csv", header = TRUE)
 ## Start/stop stations are most popular
@@ -169,7 +170,7 @@ NetChangeDayTable <- NetChangeDayTable[c(1:20),]
 names(NetChangeDayTable) <- c('Station ID', 'Net Change per day')
 ggplot(data = NetChangeDayCounts, aes(x = Station_ID, y = NetChangePerDay)) + geom_bar(stat="identity", position = "dodge") + xlab("Station ID") + ylab("Average Net Change of Bikes Per Day") + ggtitle("Average Net Change of Bikes Per Day Vs. Station ID") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
-ui <- fluidPage(
+ui <- fluidPage(theme = shinytheme("united"),
   navbarPage("Los Angeles Bike Sharing Data Analysis",
              tabPanel("Summary",
                       p(),

@@ -5,6 +5,6 @@ account: frostcreator
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 553223
-bundleId: 1682688
+bundleId: 1682731
 url: https://frostcreator.shinyapps.io/capital_one_summit/
-when: 1541420486.39162
+when: 1541422285.51919
